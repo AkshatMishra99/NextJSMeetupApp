@@ -1,30 +1,6 @@
+import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
-const DUMMY_MEETUPS = [
-	{
-		id: 1,
-		title: "Lal Kila - First Meetup",
-		image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Delhi_fort.jpg/1920px-Delhi_fort.jpg",
-		address:
-			" Netaji Subhash Marg, Lal Qila, Chandni Chowk, New Delhi, Delhi 110006",
-		description: "This is a first meetup",
-	},
-	{
-		id: 2,
-		title: "Lal Kila - Second Meetup",
-		image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Delhi_fort.jpg/1920px-Delhi_fort.jpg",
-		address:
-			" Netaji Subhash Marg, Lal Qila, Chandni Chowk, New Delhi, Delhi 110006",
-		description: "This is a second meetup",
-	},
-	{
-		id: 3,
-		title: "Lal Kila - Third Meetup",
-		image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Delhi_fort.jpg/1920px-Delhi_fort.jpg",
-		address:
-			" Netaji Subhash Marg, Lal Qila, Chandni Chowk, New Delhi, Delhi 110006",
-		description: "This is a third meetup",
-	},
-];
+
 const index = (props) => {
 	return (
 		<>
@@ -34,8 +10,24 @@ const index = (props) => {
 	);
 };
 export async function getStaticProps() {
+	const client = await MongoClient.connect(
+		"mongodb+srv://zedith9903:milestone0903@cluster0.bcm0h.mongodb.net/meetups?retryWrites=true&w=majority"
+	);
+	const db = client.db();
+	const meetupsCollection = db.collection("meetups");
+	const meetups = await meetupsCollection.find().toArray();
+	console.log(meetups);
+	client.close();
+
 	return {
-		props: { meetups: DUMMY_MEETUPS },
+		props: {
+			meetups: meetups.map((meetup) => ({
+				title: meetup.title,
+				image: meetup.image,
+				address: meetup.address,
+				id: meetup._id.toString(),
+			})),
+		},
 		revalidate: 10,
 	};
 }

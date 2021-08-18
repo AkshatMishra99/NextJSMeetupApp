@@ -1,23 +1,52 @@
+import { MongoClient, ObjectId } from "mongodb";
 import MeetupDetails from "../../components/meetups/MeetupDetails";
 
-const DetailPage = () => {
-	const details = {
-		id: 1,
-		title: "The first meetup",
-		image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Delhi_fort.jpg/1920px-Delhi_fort.jpg",
-		address:
-			"Netaji Subhash Marg, Lal Qila, Chandni Chowk, New Delhi, Delhi 110006",
-		description: "The first meetup",
-	};
+const DetailPage = (props) => {
+	// const details = ;
+	const { meetupData: meetup } = props;
 	return (
 		<MeetupDetails
-			id={details.id}
-			title={details.title}
-			description={details.description}
-			address={details.address}
-			image={details.image}
+			// id={meetup.id}
+			title={meetup.title}
+			description={meetup.description}
+			address={meetup.address}
+			image={meetup.image}
 		/>
 	);
 };
-
+export const getStaticPaths = async () => {
+	const client = await MongoClient.connect(
+		"mongodb+srv://zedith9903:milestone0903@cluster0.bcm0h.mongodb.net/meetups?retryWrites=true&w=majority"
+	);
+	const db = client.db();
+	const meetupsCollection = db.collection("meetups");
+	const meetups = await meetupsCollection.find({}, "_id").toArray();
+	const paths = meetups.map((meetup) => ({
+		params: { meetupID: meetup._id.toString() },
+	}));
+	client.close();
+	return {
+		paths,
+		fallback: false,
+	};
+};
+export const getStaticProps = async (ctx) => {
+	// console.log(ctx.params.meetupID);
+	const meetupID = ctx.params.meetupID;
+	console.log(meetupID);
+	const client = await MongoClient.connect(
+		"mongodb+srv://zedith9903:milestone0903@cluster0.bcm0h.mongodb.net/meetups?retryWrites=true&w=majority"
+	);
+	const db = client.db();
+	const meetupsCollection = db.collection("meetups");
+	const meetup = await meetupsCollection.findOne({ _id: ObjectId(meetupID) });
+	console.log(meetup);
+	client.close();
+	// const { _id, title, image, address } = meetup;
+	return {
+		props: {
+			meetupData: { ...meetup, _id: meetup._id.toString() },
+		},
+	};
+};
 export default DetailPage;
