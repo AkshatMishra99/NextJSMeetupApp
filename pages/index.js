@@ -7,6 +7,10 @@ const index = (props) => {
 		<>
 			<Head>
 				<title>The NextJS Meetup Project</title>
+				<meta
+					type="description"
+					content="Browse a huge list of highly active React Meetups!"
+				/>
 			</Head>
 			<h1>This is the homepage</h1>
 			<MeetupList meetups={props.meetups} />
