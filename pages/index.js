@@ -1,9 +1,13 @@
+import Head from "next/head";
 import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
 
 const index = (props) => {
 	return (
 		<>
+			<Head>
+				<title>The NextJS Meetup Project</title>
+			</Head>
 			<h1>This is the homepage</h1>
 			<MeetupList meetups={props.meetups} />
 		</>
